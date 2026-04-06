@@ -1,0 +1,25 @@
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Local databases / runtime files
+config/preptrack.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Generated output
+dist/
+build/
+coverage/
