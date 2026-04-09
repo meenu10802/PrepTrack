@@ -6,6 +6,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const express = require('express');
 const session = require('express-session');
+const { MongoStore } = require('connect-mongo');
 const { initializeDB, resetDB } = require('./config/sqlite');
 const sqlite3 = require('sqlite3').verbose();
 const nodemailer = require('nodemailer');
@@ -18,6 +19,7 @@ const app = express();
 const path = require('path');
 dotenv.config();
 connectDB();
+app.set('trust proxy', 1);
 
 const db = initializeDB();
 
@@ -32,7 +34,17 @@ app.use(
     secret: process.env.SESSION_SECRET || 'your_session_secret',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/preptrack',
+      collectionName: 'sessions',
+      ttl: 14 * 24 * 60 * 60,
+    }),
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+    },
   })
 );
 //Nodejs uses express to handle this HTTP request

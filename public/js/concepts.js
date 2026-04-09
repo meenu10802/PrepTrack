@@ -543,6 +543,19 @@ async function saveNote(questionId) {
             body: JSON.stringify({ questionId, content }),
         });
         if (!response.ok) throw new Error('Failed to save note');
+        const editor = document.getElementById(`note-editor-${questionId}`);
+        if (editor) {
+            editor.style.display = 'none';
+            editor.classList.remove('active');
+        }
+        const q = cachedQuestions.find((x) => uidStr(x._id) === uidStr(questionId));
+        if (q) {
+            const uid = getUserId();
+            if (!q.notes) q.notes = [];
+            const existing = q.notes.find((n) => uidStr(n.userId) === uidStr(uid));
+            if (existing) existing.content = content;
+            else q.notes.push({ userId: uid, content });
+        }
     } catch (err) {
         console.error('Error saving note:', err.message);
     }
